@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # styleapp
 
 A new Flutter project.
@@ -14,3 +15,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+=======
+# StylApp
+Repositorio proyecto de aula desarrollo móvil StylApp
+>>>>>>> 7a6e25e0dd8348d3e9a224b1d62c82ff92171e39
