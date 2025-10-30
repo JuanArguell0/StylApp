@@ -1,4 +1,3 @@
-// server/bin/server.dart
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -9,11 +8,11 @@ import '../lib/routes/citas_routes.dart';
 import '../lib/routes/barberos_routes.dart';
 import '../lib/routes/servicios_routes.dart';
 import '../lib/routes/admin_users_routes.dart';
-import '../lib/routes/valoraciones_routes.dart'; 
+import '../lib/routes/valoraciones_routes.dart';
 import '../lib/middleware/auth_middleware.dart';
 import '../lib/routes/admin_citas_routes.dart'; // 👈 nuevo
 
-void main() async {
+Future<void> main() async {
   final env = DotEnv()..load();
   await initDatabase();
 
@@ -28,8 +27,8 @@ void main() async {
   // Router protegido (requiere token)
   // ------------------------
   final secureRouter = Router()
-    ..mount('/', citasRoutes)          // 👈 citas requieren token
-    ..mount('/', valoracionesRoutes)   // 👈 valoraciones requieren token
+    ..mount('/', citasRoutes)          // citas requieren token
+    ..mount('/', valoracionesRoutes)   // valoraciones requieren token
     ..get('/', (Request req) {
       final user = req.context['user'] as Map<String, dynamic>?;
       return Response.ok(
@@ -41,10 +40,10 @@ void main() async {
   // ------------------------
   final adminRouter = Router()
     ..get('/metrics', (Request req) => Response.ok('Métricas admin OK\n'))
-    ..mount('/', serviciosRoutes)   // ✅ solo admin crea/edita servicios
-    ..mount('/', barberosRoutes)    // ✅ solo admin crea/edita barberos
-    ..mount('/', adminUsersRoutes) // ✅ solo admin crea usuarios barbero/admin
-    ..mount('/', adminCitasRoutes); //  completar manual
+    ..mount('/', serviciosRoutes)    // admin crea/edita servicios
+    ..mount('/', barberosRoutes)     // admin crea/edita barberos
+    ..mount('/', adminUsersRoutes)   // admin crea usuarios barbero/admin
+    ..mount('/', adminCitasRoutes);  // admin gestiona citas
 
   // ------------------------
   // Handlers con middlewares específicos
@@ -76,8 +75,9 @@ void main() async {
       .addMiddleware(corsMiddleware)
       .addHandler(app);
 
-  final server = await io.serve(handler, 'localhost', 8080);
-  print('🚀 Backend corriendo en http://localhost:8080');
+  // 🚀 Importante: escuchar en 0.0.0.0 para aceptar conexiones externas
+  final server = await io.serve(handler, '0.0.0.0', 8080);
+  print('🚀 Backend corriendo en http://${server.address.host}:${server.port}');
 }
 
 // ------------------------
