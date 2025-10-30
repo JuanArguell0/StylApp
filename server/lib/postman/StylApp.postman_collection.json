@@ -1,0 +1,134 @@
+{
+  "info": {
+    "name": "StylApp API - Guía de Pruebas",
+    "_postman_id": "abcd1234-5678-90ef-ghij-klmnopqrstuv",
+    "description": "Colección de pruebas para StylApp Backend. Incluye Health, Registro, Login, Ruta Protegida y Ruta Admin con ejemplos de headers, body y respuestas esperadas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Verifica que el backend está activo. Respuesta esperada: ✅ Backend StylApp activo"
+      }
+    },
+    {
+      "name": "2. Registro Cliente",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Juan Cliente\",\n  \"email\": \"cliente@example.com\",\n  \"telefono\": \"3001112233\",\n  \"contrasena\": \"Cliente#123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/register",
+          "host": ["{{base_url}}"],
+          "path": ["api", "register"]
+        },
+        "description": "Registra un cliente (rol_id por defecto = 1)."
+      }
+    },
+    {
+      "name": "3. Registro Admin",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Admin\",\n  \"email\": \"admin@example.com\",\n  \"telefono\": \"3000000000\",\n  \"contrasena\": \"Admin#123\",\n  \"rol_id\": 3\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/register",
+          "host": ["{{base_url}}"],
+          "path": ["api", "register"]
+        },
+        "description": "Registra un administrador (rol_id = 3)."
+      }
+    },
+    {
+      "name": "4. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonData = pm.response.json();",
+              "if (jsonData.token) {",
+              "  pm.environment.set(\"token\", jsonData.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"contrasena\": \"Admin#123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/login",
+          "host": ["{{base_url}}"],
+          "path": ["api", "login"]
+        },
+        "description": "Inicia sesión. Guarda automáticamente el token en la variable {{token}}."
+      }
+    },
+    {
+      "name": "5. Ruta Protegida (Secure)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/secure",
+          "host": ["{{base_url}}"],
+          "path": ["api", "secure"]
+        },
+        "description": "Ruta protegida. Requiere token válido. Respuesta esperada: 'Área segura. Hola <email> (rol <id>)'"
+      }
+    },
+    {
+      "name": "6. Ruta Admin (Metrics)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/admin/metrics",
+          "host": ["{{base_url}}"],
+          "path": ["api", "admin", "metrics"]
+        },
+        "description": "Ruta solo para administradores (rol_id = 3). Respuesta esperada: 'Métricas admin OK'."
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
